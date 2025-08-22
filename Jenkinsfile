@@ -1,30 +1,59 @@
 pipeline {
   agent any
-  stages {
+  options {
+    skipDefaultCheckout(true)
+    timestamps()
+  }
+  environment {
+    REGISTRY        = 'docker.io'
+    DOCKERHUB_REPO  = 'bear08/inventory-management-system'       // <— your Docker Hub repo
+    IMAGE_TAG       = "${env.BRANCH_NAME ?: 'main'}-${env.BUILD_NUMBER}"
+    FULL_IMAGE      = "${env.DOCKERHUB_REPO}:${env.IMAGE_TAG}"
+  }
 
-    stage('Clone Repo') {
-      steps { git branch: 'main', url: 'https://github.com/atulkamble/Inventory-Manager.git' }
-    }
-    stage('Build Docker') {
+  stages {
+    stage('Checkout') {
       steps {
-        sh 'docker build -t inventory-manager:staging .'
+        git branch: 'main', url: 'https://github.com/devikjagani/inventory-management-aws-docker-project.git'
       }
     }
-    stage('Push to ECR') {
+
+    stage('Build Docker') {
       steps {
-        withCredentials([string(credentialsId: 'aws-ecr-creds', variable: 'ECR_LOGIN')]) {
-          sh 'aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws'
-          sh 'docker tag inventory-manager:staging public.ecr.aws/x4u2n2b1/atulkamble:staging'
-          sh 'docker push public.ecr.aws/x4u2n2b1/atulkamble:staging'
+        sh """
+          docker build -t ${FULL_IMAGE} .
+          docker tag ${FULL_IMAGE} ${DOCKERHUB_REPO}:latest
+        """
+      }
+    }
+
+    stage('Login & Push to Docker Hub') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'DH_USER',
+          passwordVariable: 'DH_PASS'
+        )]) {
+          sh """
+            echo "${DH_PASS}" | docker login -u "${DH_USER}" --password-stdin ${REGISTRY}
+            docker push ${FULL_IMAGE}
+            docker push ${DOCKERHUB_REPO}:latest
+            docker logout ${REGISTRY}
+          """
         }
       }
     }
-    stage('Deploy to EKS') {
-      steps {
-        sh 'git clone https://github.com/atulkamble/Inventory-Manager.git'
-        sh ' cd 02-staging/k8s'
-        sh 'kubectl apply -f k8s/staging-deployment.yaml'
-      }
+
+
+  }
+
+  post {
+    always {
+      echo "Build: ${env.BUILD_NUMBER} finished with status: ${currentBuild.currentResult}"
+    }
+    cleanup {
+      // Optional local cleanup to save space
+      sh "docker image prune -f || true"
     }
   }
 }
