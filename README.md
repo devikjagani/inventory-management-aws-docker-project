@@ -19,8 +19,8 @@ inventory-management-system project using aws-docker-jenkins-python
 
 ### Clone Repo
 ```
-git clone https://github.com/atulkamble/Inventory-Manager.git
-cd Inventory-Manager
+git clone https://github.com/devikjagani/inventory-management-aws-docker-project.git
+cd inventory-management-aws-docker-project
 ```
 ---
 ## 🧩 PHASE 1: DEVELOPMENT ENVIRONMENT
@@ -64,7 +64,7 @@ sudo docker login
 ### 📁 Project Structure:
 
 ```
-inventory-manager/
+inventory-management-aws-docker-project/
 ├── app/
 │   ├── main.py
 │   ├── requirements.txt
@@ -79,10 +79,10 @@ Here’s a full example of an **Inventory Manager** app structure using **Python
 
 ---
 
-### 📁 Project: `inventory-manager/`
+### 📁 Project: `inventory-management-aws-docker-project/`
 
 ```
-inventory-manager/
+inventory-management-aws-docker-project/
 ├── app/
 │   ├── main.py
 │   ├── requirements.txt
@@ -259,7 +259,7 @@ if __name__ == "__main__":
 ### ✅ How to Run
 
 ```bash
-cd /home/ec2-user/Inventory-Manager/01-dev/
+cd /home/ec2-user/inventory-management-aws-docker-project/01-dev/
 python3 -m venv venv
 source venv/bin/activate # on Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -281,7 +281,7 @@ CMD ["python", "main.py"]
 ### ✅ Commands:
 
 ```bash
-cd /home/ec2-user/Inventory-Manager/01-dev
+cd /home/ec2-user/inventory-management-aws-docker-project/01-dev
 sudo docker build -t atuljkamble/inventory-dev .
 sudo docker images
 sudo docker push atuljkamble/inventory-dev
@@ -386,23 +386,23 @@ Save and Finish
 
 ### ECR 
 ```
-cd /Users/atul/Downloads/Inventory-Manager/01-dev
+cd /Users/atul/Downloads/inventory-management-aws-docker-project/01-dev
 ```
 // docker engine in running state 
 
 ECR >> Public Repo >> Create Repo
 
-Repository name: atulkamble
-URI: public.ecr.aws/x4u2n2b1/atulkamble
-Image name: inventory-manager:staging
+Repository name: devikjagani
+URI: public.ecr.aws/x4u2n2b1/devikjagani
+Image name: inventory-management-aws-docker-project:staging
 ```
-docker build -t inventory-manager:staging .
+docker build -t inventory-management-aws-docker-project:staging .
 
-docker tag inventory-manager:staging public.ecr.aws/x4u2n2b1/atulkamble:staging
+docker tag inventory-management-aws-docker-project:staging public.ecr.aws/x4u2n2b1/devikjagani:staging
 
 aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
 
-docker push public.ecr.aws/x4u2n2b1/atulkamble:staging
+docker push public.ecr.aws/x4u2n2b1/devikjagani:staging
 ```
 ---
 
@@ -415,18 +415,18 @@ pipeline {
   agent any
   stages {
     stage('Clone') {
-      steps { git 'https://github.com/yourorg/inventory-manager.git' }
+      steps { git 'https://github.com/yourorg/inventory-management-aws-docker-project.git' }
     }
     stage('Build Docker') {
       steps {
-        sh 'docker build -t inventory-manager:staging .'
+        sh 'docker build -t inventory-management-aws-docker-project:staging .'
       }
     }
     stage('Push to ECR') {
       steps {
         withCredentials([string(credentialsId: 'aws-ecr-creds', variable: 'ECR_LOGIN')]) {
           sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account_id>.dkr.ecr.us-east-1.amazonaws.com'
-          sh 'docker tag inventory-manager:staging <ecr-repo>'
+          sh 'docker tag inventory-management-aws-docker-project:staging <ecr-repo>'
           sh 'docker push <ecr-repo>'
         }
       }
@@ -528,7 +528,7 @@ spec:
 ## 🗂 GitHub Repo Structure
 
 ```
-inventory-manager/
+inventory-management-aws-docker-project/
 ├── app/
 ├── Dockerfile
 ├── Jenkinsfile
