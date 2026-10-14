@@ -45,8 +45,8 @@ ssh -i "key.pem" ec2-user@ec2-18-206-204-23.compute-1.amazonaws.com
 sudo dnf update 
 sudo dnf install python tree git docker -y
 
-git config --global user.name "Atul Kamble"
-git config --global user.email "atul_kamble@hotmail.com"
+git config --global user.name "user.name"
+git config --global user.email "user.email"
 git config --list
 
 sudo systemctl start docker 
@@ -282,10 +282,10 @@ CMD ["python", "main.py"]
 
 ```bash
 cd /home/ec2-user/inventory-management-aws-docker-project/01-dev
-sudo docker build -t atuljkamble/inventory-dev .
+sudo docker build -t devikjagani/inventory-dev .
 sudo docker images
-sudo docker push atuljkamble/inventory-dev
-sudo docker run -d -p 5000:5000 atuljkamble/inventory-dev
+sudo docker push devikjagani/inventory-dev
+sudo docker run -d -p 5000:5000 devikjagani/inventory-dev
 sudo docker container ls
 sudo docker container stop 62bcca5a4efe
 ```
